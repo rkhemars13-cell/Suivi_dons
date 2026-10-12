@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Suivi d'Objectif Financier</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --primary: #2ecc71;
+            --primary-dark: #27ae60;
+            --text: #2c3e50;
+            --muted: #7f8c8d;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 200px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            color: var(--muted);
+            margin-bottom: 25px;
+            font-size: 1rem;
+        }
+        .amount-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--text);
+            margin-bottom: 20px;
+        }
+        .progress-container {
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            position: relative;
+            margin: 20px 0;
+            height: 24px;
+            width: 100%;
+            overflow: hidden;
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, var(--primary), #3498db);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease-in-out;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: var(--muted);
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        input[type="number"] {
+            flex: 1;
+            padding: 7px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input[type="number"]:focus {
+            border-color: var(--primary);
+        }
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: var(--primary-dark);
+        }
+        .btn-reset {
+            background-color: #e74c3c;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            padding: 8px 15px;
+            opacity: 0.8;
+        }
+        .btn-reset:hover {
+            background-color: #c0392b;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 id="goal-title">Cagnotte Projet</h1>
+    <div class="subtitle" id="goal-subtitle">Objectif : <span id="target-text">1000</span> €</div>
+    
+    <div class="amount-display"><span id="current-text">0</span> €</div>
+    
+    <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    
+    <div class="stats">
+        <span id="percent-text">0%</span>
+        <span>Reste : <span id="remaining-text">1000</span> €</span>
+    </div>
+
+    <div class="input-group">
+        <input type="number" id="amount-input" placeholder="Ajouter un montant (€)" min="0" step="any">
+        <button onclick="addAmount()">Ajouter</button>
+    </div>
+    
+	
+    
+</div>
+
+<script>
+    // Configuration de base (Modifiez ces valeurs selon vos besoins)
+    const CONFIG = {
+        title: "Somme à atteindre",
+        target: 9000 // Le montant total à récolter
+    };
+
+    // Initialisation
+    let currentAmount = parseFloat(localStorage.getItem('saved_amount')) || 0;
+    
+    document.getElementById('goal-title').innerText = CONFIG.title;
+    document.getElementById('target-text').innerText = CONFIG.target.toLocaleString('fr-FR');
+    
+    function updateUI() {
+        document.getElementById('current-text').innerText = currentAmount.toLocaleString('fr-FR');
+        
+        let percentage = (currentAmount / CONFIG.target) * 100;
+        if (percentage > 100) percentage = 100;
+        if (percentage < 0) percentage = 0;
+        
+        document.getElementById('progress-bar').style.width = percentage + '%';
+        document.getElementById('percent-text').innerText = Math.round(percentage) + '%';
+        
+        let remaining = CONFIG.target - currentAmount;
+        if (remaining < 0) remaining = 0;
+        document.getElementById('remaining-text').innerText = remaining.toLocaleString('fr-FR');
+        
+        // Sauvegarde locale
+        localStorage.setItem('saved_amount', currentAmount);
+    }
+
+    function addAmount() {
+        const input = document.getElementById('amount-input');
+        const value = parseFloat(input.value);
+        
+        if (!isNaN(value) && value > 0) {
+            currentAmount += value;
+            updateUI();
+            input.value = '';
+        }
+    }
+
+    function resetTracker() {
+        if (confirm("Voulez-vous vraiment remettre le compteur à zéro ?")) {
+            currentAmount = 0;
+            updateUI();
+        }
+    }
+
+    // Premier affichage au chargement
+    updateUI();
+</script>
+
+</body>
+</html>
